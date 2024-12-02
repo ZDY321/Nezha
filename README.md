@@ -32,7 +32,7 @@ curl -L https://raw.githubusercontent.com/naiba/nezha/master/script/install.sh  
 > V0版本先选择n，之后在选择1
 
 ### 安装魔改主题
-~~~yaml
+
 使用上面的docker-compose方法安装时：
 
 1.template里面的文件放到服务端`/root/data/docker_data/nezha/theme-custom/template`目录里面。
