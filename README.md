@@ -21,10 +21,14 @@ services:
 ~~~
 
 `docker-compose up -d `
+
 2. 运行安装脚本
 ~~~bash
 curl -L https://raw.githubusercontent.com/naiba/nezha/master/script/install.sh  -o nezha.sh && chmod +x nezha.sh && sudo ./nezha.sh
 ~~~
+
+当在线脚本失效时，使用`install.sh`文件；将下载的文件放在`/root`,之后运行`chmod +x nezha.sh && sudo ./nezha.sh`
+
 > V0版本先选择n，之后在选择1
 
 ### 安装魔改主题
