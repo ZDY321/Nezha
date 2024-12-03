@@ -57,10 +57,15 @@ static/
 ~~~
 
 3. 运行`/root/data/docker_data/nezha/`下的`./nezha_v0.sh`
-2.重启哪吒面板服务，docker版本用 `docker restart pid` ，独立安装用 `systemctl restart nezha-dashboard`
 
-3.重启进入后台，在哪吒面板后台主题选择Custom(local)
+4. 重启哪吒面板服务，docker版本用 `docker restart pid` ，独立安装用 `systemctl restart nezha-dashboard`
 
-4.将 自定义代码.txt 里面的内容复制到哪吒面板后台的“自定义代码”文本框里
+5. 重启进入后台，在哪吒面板后台主题选择Custom(local)
 
+6. 将 自定义代码.txt 里面的内容复制到哪吒面板后台的“自定义代码”文本框里
+
+7. 使用以下命令查找 Docker 容器的位置：
+~~~yaml
+docker inspect <容器 ID 或名称> --format='{{.GraphDriver.Data.MergedDir}}'
 ~~~
+例如：`/var/lib/docker/overlay2/1a286a2031f0ed384c1db313751f563969b3bfd51dfc417cf205ef75fef40fd3/merged/dashboard/resource/template`
