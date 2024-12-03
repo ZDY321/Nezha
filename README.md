@@ -79,3 +79,9 @@ docker inspect <容器 ID 或名称> --format='{{.GraphDriver.Data.MergedDir}}'
 例如：`/var/lib/docker/overlay2/1a286a2031f0ed384c1db313751f563969b3bfd51dfc417cf205ef75fef40fd3/merged/dashboard/resource/template`
 
 > 资料来源：[哪吒探针美化教程|末晨的小站](https://blog.mochen.one/archives/86#%E6%9B%B4%E6%94%B9%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6)
+>
+> 修改顶部左边的图片就是修改static里面的那张名字为head.png的图片，文件名要一致。如果文件名不一致，请去menu.heml第5行修改
+> 
+> 站点图标header.html文件的第17行，替换掉https://cdn.amzayo.top/static/public/luban/luban_head.png
+> 
+> 底部版权信息footer.html文件的第4到8行，依照demo底部的文字按需替换
