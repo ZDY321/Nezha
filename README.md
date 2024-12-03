@@ -3,6 +3,8 @@
 > [哪吒监控 - 镜像 | 使用文档](https://nezha-v0.mereith.dev/)
 >
 > [哪吒命令修复](https://nzfix.bacon159.me/)
+>
+> [Huijiyingyingying/amzayo_template_fin_net](https://github.com/Huijiyingyingying/amzayo_template_fin_net/tree/main)
 
 ### 后台面板安装
 > 将你的 docker-compose.yml 中的 nezha docker 版本 tag 从 latest 改为固定在 v0.20.13
