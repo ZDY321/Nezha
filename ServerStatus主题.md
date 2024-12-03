@@ -193,6 +193,421 @@ extra 其他信息
 使用场景：把需要展示相同账单信息的vps分到一组，使得表头保持一致
 ~~~
 
+### [【技术】哪吒监控面板SeverStatus美化及手机端自定义部分显示功能](https://www.nodeseek.com/post-151790-1)
+~~~yaml
+<style>
+/* 手机端（屏幕宽度小于 1080px）样式 */
+@media (max-width: 1080px) {
+    .load {
+        display: none; /* 隐藏负载列 */
+    }
+ .os {
+        display: none; /* 隐藏负载列 */
+    }
+ .traffic {
+        display: block; /* 隐藏负载列 */
+    }
+.name {
+    width: 10px;           /* 将宽度固定为 30px */
+    overflow: hidden;      /* 隐藏超出部分 */
+    white-space: nowrap;   /* 禁止换行 */
+    text-overflow: ellipsis; /* 如果内容超过宽度，显示省略号 */
+}
+}
+body[theme]::before {
+    background-image: url(https://yourimage.jpg); /* 替换为自己的背景图片链接 */
+}
+
+/* 字体设置 */
+body[theme] {
+    font-family: "Consolas", Arial, Helvetica, sans-serif; /* 修改默认字体 */
+}
+</style>
+<!-- 网站统计 -->
+<script async src="https://www.googletagmanager.com"></script> /* 替换为自己的统计代码 */
+<!-- 默认半透明模式 -->
+<script>
+// server-status 默认开启分组
+    localStorage.setItem("showGroup", true)
+// server-status 主题默认半透明模式
+    localStorage.setItem('semiTransparent', true); 
+</script>
+
+<!-- Logo设置 -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var logo = document.querySelector('.navbar-brand img');
+        if (logo) {
+            logo.src = 'https://yourlogo.png'; /* 替换为自己的 Logo 图片链接 */
+        }
+    });
+</script>
+
+<!-- Favicon设置 -->
+<script>
+    var faviconurl = "https://yourlogo.png"; /* 替换为自己的 Logo 图片链接 */
+    var link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+    link.type = 'image/png';
+    link.rel = 'shortcut icon';
+    link.href = faviconurl;
+    document.getElementsByTagName('head')[0].appendChild(link);
+</script>
+/* 服务中不显示文字 */
+<style>
+.service-status .delay-today-text{display: none;visibility: hidden;}
+</style>
+~~~
+**剩余时间**
+增加剩余时间列，并添加倒计时进度条动画，在原帖基础上增加了不同进度条颜色改变，已经当开始时间和结束时间都设置为'9999-01-01T00:00:00+08:00'时将显示为999天（适用永久免费的服务器）
+[原贴参考链接](https://www.nodeseek.com/post-132638-1)
+代码：
+~~~yaml
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 在表头添加“剩余时间”列
+    var downtimeCells = document.querySelectorAll('th.node-cell.os.center');
+    downtimeCells.forEach(function(cell) {
+        var newTh = document.createElement('th');
+        newTh.className = 'node-cell downtime center';
+        newTh.textContent = '剩余时间';
+        cell.parentNode.insertBefore(newTh, cell.nextSibling);
+    });
+    // 定义节点信息
+    const affLinks = {
+        1: { 
+            startDate: new Date('2024-08-12T00:00:00+08:00'),
+            expirationDate: new Date('2025-02-01T00:00:00+08:00'),
+            content: {
+                type: 'text',
+                value: ''
+            }
+        },/* 正常节点 */
+        2: { 
+            startDate: new Date('2024-08-12T00:00:00+08:00'),
+            expirationDate: new Date('2024-08-20T00:00:00+08:00'),
+            content: {
+                type: 'text',
+                value: ''
+            }
+        },/* 过期节点 */
+        3: { 
+            startDate: new Date('9999-01-01T00:00:00+08:00'),
+            expirationDate: new Date('9999-01-01T00:00:00+08:00'),
+            content: {
+                type: 'text',
+                value: ''
+            }
+        }/* 永久节点 */
+  };
+
+   const createLink = (linkConfig) => {
+       const $link = document.createElement('a');
+       $link.href = linkConfig.value;
+       $link.textContent = linkConfig.label || linkConfig.value;
+
+       if (linkConfig.icon) {
+           const $icon = document.createElement('img');
+           $icon.src = linkConfig.icon;
+           $icon.alt = linkConfig.iconAlt || '';
+           $link.appendChild($icon);
+       }
+
+       if (linkConfig.text) {
+           const $text = document.createElement('span');
+           $text.textContent = linkConfig.text;
+           $link.appendChild(document.createTextNode(' '));
+           $link.appendChild($text);
+       }
+
+       return $link;
+   };
+
+   const createIcon = (iconConfig) => {
+       const $icon = document.createElement('img');
+       $icon.src = iconConfig.value;
+       $icon.alt = iconConfig.label || 'Icon';
+
+       if (iconConfig.text) {
+           const $text = document.createElement('span');
+           $text.textContent = iconConfig.text;
+           $icon.appendChild(document.createTextNode(' '));
+           $icon.appendChild($text);
+       }
+
+       return $icon;
+   };
+
+   const createSmokeAnimation = () => {
+       const $smokeContainer = document.createElement('div');
+       $smokeContainer.className = 'smoke-container';
+
+       for (let i = 0; i < 5; i++) {
+           const $particle = document.createElement('div');
+           $particle.className = 'smoke-particle';
+           $smokeContainer.appendChild($particle);
+       }
+
+       return $smokeContainer;
+   };
+
+   const createCountdown = (startDate, expirationDate) => {
+       const total = expirationDate.getTime() - startDate.getTime();
+
+       const $countdownContainer = document.createElement('div');
+       $countdownContainer.style.position = 'relative';
+       $countdownContainer.style.width = '100%';
+       $countdownContainer.style.backgroundColor = '#333';
+       $countdownContainer.style.borderRadius = '5px';
+       $countdownContainer.style.overflow = 'hidden';
+       $countdownContainer.style.boxShadow = 'inset 0 1px 3px rgba(0,0,0,0.2), 0 1px 2px rgba(0,0,0,0.3)'; // 背景3D效果
+       $countdownContainer.style.background = 'linear-gradient(to bottom, #444, #222)'; // 背景渐变效果
+
+       const $progressBar = document.createElement('div');
+       $progressBar.style.position = 'absolute';
+       $progressBar.style.top = '0';
+       $progressBar.style.left = '0';
+       $progressBar.style.height = '100%';
+       $progressBar.style.backgroundColor = '#388e3c'; // 调暗后的绿色进度条
+       $progressBar.style.width = '0%';
+       $progressBar.style.boxShadow = 'inset 0 1px 3px rgba(0,0,0,0.2), 0 1px 2px rgba(0,0,0,0.3)'; // 进度条3D效果
+
+       const $countdownTime = document.createElement('span');
+       $countdownTime.style.position = 'relative';
+       $countdownTime.style.zIndex = '1';
+       $countdownTime.style.color = '#fff'; // 恢复为白色字体
+       $countdownTime.style.padding = '5px';
+       $countdownTime.style.fontSize = '12px'; // 调小字体
+       $countdownTime.textContent = ' ';
+
+       const $smoke = createSmokeAnimation();
+
+      const updateCountdown = () => {
+        const now = new Date();
+        const diff = now.getTime() - startDate.getTime();
+
+    // 判断是否为特殊日期
+    if (startDate.getTime() === new Date('9999-01-01T00:00:00+08:00').getTime() &&
+        expirationDate.getTime() === new Date('9999-01-01T00:00:00+08:00').getTime()) {
+        $progressBar.style.width = '100%';
+        $progressBar.style.backgroundColor = '#2e7d32'; // 特殊情况的颜色（绿色）
+        $countdownTime.textContent = '999天';
+        return;
+    }
+
+    if (diff >= total) {
+        clearInterval(countdownInterval);
+        $countdownTime.textContent = '已过期';
+        $progressBar.style.backgroundColor = '#c62828'; // 到期后的深红色
+        $progressBar.style.width = '100%';
+        return;
+    }
+
+    const remainingDays = Math.ceil((total - diff) / (1000 * 60 * 60 * 24));
+    $countdownTime.textContent = `${remainingDays}天`;
+    const progress = 100 - (diff / total) * 100;
+    $progressBar.style.width = `${progress}%`;
+
+    // 根据剩余进度设置进度条颜色
+    if (progress <= 25) {
+        $progressBar.style.backgroundColor = '#c05000'; // 橙色
+    } else if (progress <= 50) {
+        $progressBar.style.backgroundColor = '#f9a825'; // 黄色
+    } else {
+        $progressBar.style.backgroundColor = '#388e3c'; // 绿色
+    }
+
+    // 更新烟雾动画的位置
+    $smoke.style.left = `${progress}%`;
+};
+
+
+       const countdownInterval = setInterval(updateCountdown, 1000);
+       updateCountdown();
+
+       $countdownContainer.appendChild($progressBar);
+       $progressBar.appendChild($smoke);
+       $countdownContainer.appendChild($countdownTime);
+
+       return $countdownContainer;
+   };
+
+   const rows = document.querySelectorAll('tr');
+   rows.forEach((row) => {
+       let osCell = row.querySelector('td.node-cell.os.center');
+       let downtimeCell = document.createElement('td');
+       downtimeCell.classList.add('node-cell', 'downtime', 'center');
+       let nodeId = row.id.substring(1); 
+       let affLink = affLinks[nodeId];
+       if (!affLink) {
+           affLink = {
+               content: {
+                   type: 'text',
+                   value: '  '
+               }
+           };
+       }
+       if (osCell && affLink && affLink.content) {
+           switch (affLink.content.type) {
+               case 'link':
+                   let link = createLink(affLink.content);
+                   downtimeCell.appendChild(link);
+                   break;
+               case 'icon':
+                   let icon = createIcon(affLink.content);
+                   downtimeCell.appendChild(icon);
+                   break;
+               default:
+                   let text = document.createTextNode(affLink.content.value);
+                   downtimeCell.appendChild(text);
+                   break;
+           }
+
+           if (affLink.startDate && affLink.expirationDate) {
+               let countdown = createCountdown(affLink.startDate, affLink.expirationDate);
+               downtimeCell.appendChild(countdown);
+           }
+
+           osCell.parentNode.insertBefore(downtimeCell, osCell.nextSibling);
+       }
+   });
+});
+</script>
+
+<style>
+@keyframes smoke {
+   0% {
+       transform: translateY(0) scale(1);
+       opacity: 1;
+   }
+   100% {
+       transform: translateY(-20px) scale(0.5);
+       opacity: 0;
+   }
+}
+.smoke-container {
+   position: absolute;
+   top: 0;
+   right: 0;
+   width: 10px;
+   height: 100%;
+   overflow: visible;
+}
+.smoke-particle {
+   position: absolute;
+   bottom: 0;
+   width: 4px;
+   height: 4px;
+   background: rgba(144, 238, 144, 0.7); /* 淡绿色 */
+   border-radius: 50%;
+   animation: smoke 1s infinite;
+}
+.smoke-particle:nth-child(1) {
+   left: 0;
+   animation-delay: 0s;
+}
+.smoke-particle:nth-child(2) {
+   left: 2px;
+   animation-delay: 0.2s;
+}
+.smoke-particle:nth-child(3) {
+   left: 4px;
+   animation-delay: 0.4s;
+}
+.smoke-particle:nth-child(4) {
+   left: 6px;
+   animation-delay: 0.6s;
+}
+.smoke-particle:nth-child(5) {
+   left: 8px;
+   animation-delay: 0.8s;
+}
+</style>
+~~~
+**页面特效**
+~~~yaml
+<script src="https://cdn.jsdelivr.net/gh/mocchen/cssmeihua/js/aixin.js"></script>/* 点击爱心特效 */
+<script src="https://cdn.jsdelivr.net/gh/mocchen/cssmeihua/js/yinghua.js"></script>/* 页面樱花特效 */
+~~~
+**手机端自定义功能**
+配合主题颜色，手机端状态栏始终显示为白色。增加手机端启动动画（配合安卓apk打包或ios免签封装为webapp使用效果更佳）。自定义更改手机端背景图片。
+~~~yaml
+<head>
+    <meta http-equiv="Content-Type" content="text/html;">
+    <meta http-equiv="x-ua-compatible" content="">
+    <meta name="theme-color" content="#FFFFFF">/* 白色 */
+    <style>
+        /* 适用于iPhone 15 Pro的样式其他机型可自行更改最大及最小宽度 */
+        @media only screen and (min-device-width: 375px) and (max-device-width: 1179px) {
+            /* 启动动画的样式 */
+            #loading-animation {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: #fff; /* 背景颜色 */
+                z-index: 9999;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                overflow: hidden; /* 防止图片超出视口 */
+            }
+
+            #loading-animation img {
+                width: 100vw; /* 图片宽度占满视口宽度 */
+                height: 100vh; /* 图片高度占满视口高度 */
+                object-fit: cover; /* 图片按比例填充并覆盖整个视口 */
+                animation: fadeInOut 3s ease-in-out infinite; /* 动画效果 */
+            }
+
+            /* 图片渐变的动画效果 */
+            @keyframes fadeInOut {
+                0%, 100% {
+                    opacity: 1;
+                }
+                50% {
+                    opacity: 0.5;
+                }
+            }
+        }
+
+        /* 其他样式 */
+        body[theme]::before {
+            background-image: url(https://yourimage.jpg); /* 替换为自己的背景图片链接 */
+        }
+
+        /* 字体设置 */
+        body[theme] {
+            font-family: "Consolas", Arial, Helvetica, sans-serif; /* 修改默认字体 */
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 启动动画HTML -->
+    <div id="loading-animation" style="display: none;">
+        <img src="https://yourimage.gif" alt="Loading..."> <!-- 替换为自己的动画图片链接 -->
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var loadingAnimation = document.getElementById('loading-animation');
+            // 检查是否为主页面
+            if (window.location.pathname === '/' || window.location.pathname === '/index.html') {
+                // 如果是主页面，显示加载动画
+                loadingAnimation.style.display = 'flex';
+
+                // 设置5秒后隐藏加载动画
+                setTimeout(function() {
+                    loadingAnimation.style.display = 'none';
+                }, 5000); // 5秒（5000毫秒）
+            }
+        });
+    </script>
+</body>
+~~~
+
+
 ### 官方自定义
 > [🎉 通过自定义代码实现server-status主题深色模式半透明样式的前置准备 by nap0o · Pull Request #395 · nezhahq/nezha](https://github.com/nezhahq/nezha/pull/395)
 实现server-status主题深色模式半透明样式的自定义代码如下：
