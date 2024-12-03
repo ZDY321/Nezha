@@ -1,6 +1,10 @@
 > 哪吒面板V0 & 魔改主题的备份
 
 ### 后台面板安装
+> 将你的 docker-compose.yml 中的 nezha docker 版本 tag 从 latest 改为固定在 v0.20.13
+> 
+> 将你的全部 agent 禁用自动更新或更新到 v0.20.5 (一个 v0 的 final 版本)
+
 1. `docker-compose.yml`:
 ~~~yaml
 # 魔改版
