@@ -1,3 +1,5 @@
+> [improve: status-server主题agent账单信息展示 by nap0o · Pull Request #425 · nezhahq/nezha](https://github.com/nezhahq/nezha/pull/425)
+
 #### 账单和剩余时间
 支持价格和期限单独设置
 账单信息附加到group分组控制
