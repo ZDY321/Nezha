@@ -1,3 +1,5 @@
+### 公开备注个性化
+
 > [improve: status-server主题agent账单信息展示 by nap0o · Pull Request #425 · nezhahq/nezha](https://github.com/nezhahq/nezha/pull/425)
 
 #### 账单和剩余时间
@@ -191,4 +193,126 @@ extra 其他信息
 使用场景：把需要展示相同账单信息的vps分到一组，使得表头保持一致
 ~~~
 
+### 官方自定义
+> [🎉 通过自定义代码实现server-status主题深色模式半透明样式的前置准备 by nap0o · Pull Request #395 · nezhahq/nezha](https://github.com/nezhahq/nezha/pull/395)
+实现server-status主题深色模式半透明样式的自定义代码如下：
+~~~yaml
+<style>
+body[theme="dark"]::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    /** bing每日壁纸 **/
+    background: url(https://imgapi.cn/bing.php) no-repeat 50% 50%;
+    background-size: cover;
+    z-index: -1;
+}
 
+body[theme="dark"] {
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    background: rgba(0, 0, 0, 0.8);
+    color: #f1f1f1;
+}
+
+body[theme="dark"]::after {
+    content: "";
+    position: fixed;
+}
+
+body[theme="dark"] .navbar {
+    /** 顶部导航条 背景 **/
+    background-color: rgba(0, 0, 0, 0.8);
+    box-shadow: none;
+    border: none;
+}
+
+body[theme="dark"] .navbar .navbar-brand {
+    color: #ffffff;
+}
+
+body[theme="dark"] .navbar .dropdown-menu {
+    /** 二级导航下拉 背景 **/
+    background-color: rgba(0, 0, 0, 0.85);
+    border-top: none;
+    border-color: #31363b;
+    box-shadow: rgba(0, 0, 0, 0.18) 0px 6px 12px;
+}
+
+body[theme="dark"] .navbar .dropdown-menu > li > a {
+    color: #c8c3bc;
+}
+
+body[theme="dark"] .navbar .dropdown-menu > li > a:focus,
+body[theme="dark"] .navbar .dropdown-menu > li > a:hover {
+    /** 二级导航鼠标悬停选中背景 **/
+    background-color: rgba(0, 0, 0, 0.95);
+    background-image: linear-gradient(#1c1d26 0, #1c1d26 100%);
+}
+
+body[theme="dark"] .navbar .navbar-nav .open .dropdown-menu > li > a {
+    color: #f1f1f1;
+}
+
+body[theme="dark"] .table,
+body[theme="dark"] .table-condensed > tbody > tr,
+body[theme="dark"] .table-hover > tbody > tr,
+body[theme="dark"] .table-hover > tbody > tr:hover,
+body[theme="dark"] .table-striped tbody > tr.even,
+body[theme="dark"] .table-striped tbody > tr.odd,
+body[theme="dark"] .table-striped tbody > tr.even > td,
+body[theme="dark"] .table-striped tbody > tr.even > th,
+body[theme="dark"] .table-striped tbody > tr.odd > td,
+body[theme="dark"] .table-striped tbody > tr.odd > th,
+body[theme="dark"] .table-striped tbody > tr.even > td:hover,
+body[theme="dark"] .table-striped tbody > tr.even > th:hover,
+body[theme="dark"] .table-striped tbody > tr.odd > td:hover,
+body[theme="dark"] .table-striped tbody > tr.odd > th:hover,
+body[theme="dark"] .table-striped tbody > tr.expandRow:hover {
+    background-color: transparent !important;
+}
+
+body[theme="dark"] .content {
+    /** 主box 背景 **/
+    background-color: rgba(28, 29, 38, 0.8); 
+    border: none;
+    box-shadow: rgba(0, 0, 0, 0.5) 0 0.625em 2em;
+    -webkit-box-shadow: rgba(0, 0, 0, 0.5) 0 0.625em 2em;
+    box-shadow: rgba(0, 0, 0, 0.5) 0 0.625em 2em;
+}
+
+body[theme="dark"] .table > thead > tr.node-group-tag > th,
+body[theme="dark"] .table > thead > tr.node-group-tag > th:before {
+    background: unset;
+}
+
+body[theme="dark"] .table > tbody > tr > td:before,
+body[theme="dark"] .table > tfoot > tr > td:before,
+body[theme="dark"] .table > thead > tr > td:before,
+body[theme="dark"] .table > thead > tr.node-group-cell > th:before{
+     /** border-bottom 颜色 **/
+    background-color: rgba(155, 155, 155, 0.1); 
+}
+
+body[theme="dark"] .table-hover > tbody > tr:not(.expandRow):hover > td {
+    background-color: unset;
+}
+
+/* expandRow展开部分样式 */
+body[theme="dark"] .table > tbody > tr.expandRow.odd > td:before{
+    background-color: unset;
+}
+
+body[theme="dark"] .table > tbody > tr.expandRow.even > td:before{
+    background-color: unset;
+}
+/* expandRow展开部分样式结束 */
+
+body[theme="dark"] .progress {
+    background-image: none;
+    background-color: rgba(255, 255, 255, 0.075); 
+}
+</style>
+~~~
